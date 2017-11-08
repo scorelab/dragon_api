@@ -32,12 +32,12 @@ app = Flask(__name__) # initialization
 ################ DB Handeler ###################
 
 # mongodb://charitha:abcdefg123@ds149535.mlab.com:49535/epihack
-
+uri = 'mongodb://epihack:abcdefg@ds149535.mlab.com:49535/epihack'
+client = pymongo.MongoClient(uri)
+db = client.get_database()
+epihack_data = db['epihack_data']
 
 ############ WEB APP ########################
-
-
-
 api_base_url = '/test-api'
 # for index.html
 @app.route('/', methods=['GET', 'POST'])
@@ -69,8 +69,36 @@ def sample2(x,y):
     res = {"data" : x+y}
     return jsonify(res)
 
-
-
+'''
+data = {
+        'district': 'D1',
+        'ward': '1',
+        'year': '2017',
+        'month': '11',
+        'week': '46',
+        'data': { 'population_of_the_ward': '35832',
+                'area_of_the_ward': '15378.54077',
+                'no_of_public_place': '645',
+                'no_of_school': '402', 
+                'no_of_construction_site': '159',
+                'no_of_highrise_building': '311',
+                'area_of_water': '0.062',
+                'area_of_abadon_house': '0.0367',
+                'area_of_empty_land': '0.0361'
+              }
+    }
+'''
+@app.route(api_base_url + '/insertNew/district=<string:dis>/word=<int:word>/year=<int:yr>/month=<int:mnt>/week=<int:wk>/data=<string:json>', methods=["GET"])
+def insertNew(dis, word, yr, mnt, wk, json):
+    res = {'district': dis,
+        'ward': word,
+        'year': yr,
+        'month': mnt,
+        'week': wk,
+        'data': json
+        }
+    x = db.epihack_data.insertOne(res)
+    return jsonify(res)
 
 if __name__ == '__main__':
     app.run(debug=True)
