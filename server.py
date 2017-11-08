@@ -22,6 +22,7 @@
  #/
 """
 import json
+import pymongo
 from flask import Flask, render_template, request, jsonify, make_response
 from datetime import datetime
 
@@ -101,8 +102,8 @@ def insertNew(dis, word, yr, mnt, wk, json):
         'week': wk,
         'data': json
         }
-    x = db.epihack_data.insertOne(res)
-    print(x)    
+    #x = db.epihack_data.insertOne(res)
+    #print(x)    
     return jsonify(res)
 
 @app.route(api_base_url + '/insertData/district=<string:dis>/word=<int:word>/newdata=<string:data>', methods=['GET'])
