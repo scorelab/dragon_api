@@ -23,23 +23,23 @@
 """
 import json
 from flask import Flask, render_template, request, jsonify, make_response
-
 from datetime import datetime
 
-app = Flask(__name__) # initialization
+app = Flask(__name__)  # initialization
 
 
 ################ DB Handeler ###################
-
-# mongodb://charitha:abcdefg123@ds149535.mlab.com:49535/epihack
 uri = 'mongodb://epihack:abcdefg@ds149535.mlab.com:49535/epihack'
 client = pymongo.MongoClient(uri)
 db = client.get_database()
 epihack_data = db['epihack_data']
 
 ############ WEB APP ########################
-api_base_url = '/test-api'
+api_base_url = '/dragon-api'
+
 # for index.html
+
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
@@ -48,8 +48,9 @@ def home():
         print(my_input)
     return render_template('index.html')
 
-        
 # /predictions?w=???
+
+
 @app.route('/predictions')
 def predict():
     user_input = request.args.get('w')
@@ -59,15 +60,18 @@ def predict():
     json_data = json.dumps(data, ensure_ascii=False).encode('utf8')
     return json_data
 
+
 @app.route(api_base_url + '/<string:ids>/run', methods=['GET'])
 def sample1(ids):
-    res = {"data" : ids}
+    res = {"data": ids}
     return jsonify(res)
 
+
 @app.route(api_base_url + '/add/x=<int:x>&y=<int:y>', methods=['GET'])
-def sample2(x,y):
-    res = {"data" : x+y}
+def sample2(x, y):
+    res = {"data": x + y}
     return jsonify(res)
+
 
 '''
 data = {
@@ -88,18 +92,20 @@ data = {
               }
     }
 '''
-@app.route(api_base_url + '/insertNew/district=<string:dis>/word=<int:word>/year=<int:yr>/month=<int:mnt>/week=<int:wk>/data=<string:json>', methods=["GET"])
-def insertNew(dis, word, yr, mnt, wk, json):
+
+@app.route(api_base_url + '/insertNew/district=<string:dis>/word=<int:word>/year=<int:yr>/month=<int:mnt>/week=<int:wk>/data=<string:data>', methods=["GET"])
+def insertNew(dis, word, yr, mnt, wk, data):
     res = {'district': dis,
-        'ward': word,
-        'year': yr,
-        'month': mnt,
-        'week': wk,
-        'data': json
-        }
+           'ward': word,
+           'year': yr,
+           'month': mnt,
+           'week': wk,
+           'data': data
+           }
     x = db.epihack_data.insertOne(res)
     return jsonify(res)
 
+
+
 if __name__ == '__main__':
     app.run(debug=True)
-    
