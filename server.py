@@ -24,17 +24,27 @@
 import json
 from flask import Flask, render_template, request, jsonify, make_response
 from datetime import datetime
-
+import pymongo
 app = Flask(__name__)  # initialization
 
+################ Utilization functions #################
 
-################ DB Handeler ###################
+def getNormalizeValue(val, maxVal, minVal):
+    return (val - minVal)/(maxVal - minVal)
+    
+def getWeightedSum(normArr, weightArr):
+    weightedSum = 0
+    for i in range(0, len(normArr)):
+        weightedSum += normArr[i] * weightArr[i]
+    return weightedSum/sum(weightArr)
+    
+################ DB Handeler ###########################
 uri = 'mongodb://epihack:abcdefg@ds149535.mlab.com:49535/epihack'
 client = pymongo.MongoClient(uri)
-db = client.get_database()
+db = client.get_default_database()
 epihack_data = db['epihack_data']
 
-############ WEB APP ########################
+############ WEB APP ###################################
 api_base_url = '/dragon-api'
 
 # for index.html
@@ -110,9 +120,11 @@ def insertData(dis, word, data):
     res = {
         'district' : dis,
         'word' : word,
-        data.split(':')[0] : data.split(':')[1]
+        "data" : data
         }
-    return res
+    return jsonify(res)
+    print(res)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
