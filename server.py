@@ -14,16 +14,13 @@
  #       Revision:  none
  #       Compiler:  python3
  #
- #         Author:  lasithniro (c)
- #   Organization:  L2N Inc.
+ #         Author:  
+ #   Organization:  SCoRE
  #        Credits:  
  #
  # =====================================================================================
  #/
 """
-
-
-
 import difflib
 from collections import Counter
 import matplotlib.pyplot as plt
