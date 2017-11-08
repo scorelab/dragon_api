@@ -21,20 +21,25 @@
  # =====================================================================================
  #/
 """
-import difflib
-from collections import Counter
-import matplotlib.pyplot as plt
-import numpy as np
 import json
 from flask import Flask, render_template, request, jsonify, make_response
-import io
-from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
-from matplotlib.figure import Figure
 
-############ WEB APP ########################
+from datetime import datetime
 
 app = Flask(__name__) # initialization
 
+
+################ DB Handeler ###################
+
+# mongodb://charitha:abcdefg123@ds149535.mlab.com:49535/epihack
+
+
+############ WEB APP ########################
+
+
+
+api_base_url = '/test-api'
+# for index.html
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
@@ -44,6 +49,7 @@ def home():
     return render_template('index.html')
 
         
+# /predictions?w=???
 @app.route('/predictions')
 def predict():
     user_input = request.args.get('w')
@@ -53,6 +59,19 @@ def predict():
     json_data = json.dumps(data, ensure_ascii=False).encode('utf8')
     return json_data
 
- 
+@app.route(api_base_url + '/<string:ids>/run', methods=['GET'])
+def sample1(ids):
+    res = {"data" : ids}
+    return jsonify(res)
+
+@app.route(api_base_url + '/add/x=<int:x>&y=<int:y>', methods=['GET'])
+def sample2(x,y):
+    res = {"data" : x+y}
+    return jsonify(res)
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+    
