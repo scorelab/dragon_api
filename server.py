@@ -92,20 +92,27 @@ data = {
               }
     }
 '''
-
-@app.route(api_base_url + '/insertNew/district=<string:dis>/word=<int:word>/year=<int:yr>/month=<int:mnt>/week=<int:wk>/data=<string:data>', methods=["GET"])
-def insertNew(dis, word, yr, mnt, wk, data):
+@app.route(api_base_url + '/insertNew/district=<string:dis>/word=<int:word>/year=<int:yr>/month=<int:mnt>/week=<int:wk>/data=<string:json>', methods=["GET"])
+def insertNew(dis, word, yr, mnt, wk, json):
     res = {'district': dis,
-           'ward': word,
-           'year': yr,
-           'month': mnt,
-           'week': wk,
-           'data': data
-           }
+        'ward': word,
+        'year': yr,
+        'month': mnt,
+        'week': wk,
+        'data': json
+        }
     x = db.epihack_data.insertOne(res)
+    print(x)    
     return jsonify(res)
 
-
+@app.route(api_base_url + '/insertData/district=<string:dis>/word=<int:word>/newdata=<string:data>', methods=['GET'])
+def insertData(dis, word, data):
+    res = {
+        'district' : dis,
+        'word' : word,
+        data.split(':')[0] : data.split(':')[1]
+        }
+    return res
 
 if __name__ == '__main__':
     app.run(debug=True)
