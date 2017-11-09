@@ -142,5 +142,24 @@ def insertDataWieght(wieght_key, wieght_name, wieght):
     return jsonify({'acknowledged': res.acknowledged})
 
 
+@app.route(api_base_url + '/allriskforweek/year=<int:year>/week=<int:week>', methods=['GET'])
+def allRiskForWeek(year, week):
+
+    week_data = epihack_data.find(
+        {'$and': [{'week': str(week)}, {'year': (year)}]})
+
+    week_data_dic = {}
+    week_data_max_min_dic = {}
+    
+    for row in week_data:
+        for key in row['data'].keys():
+            if str(key) not in week_data_dic:
+                week_data_dic[str(key)] = []
+            week_data_dic[str(key)].append(row['data'][str(key)])
+
+        for key in week_data_dic:
+            week_data_max_min_dic[str(key)] = {'max': max(week_data_dic[str(key)]), 'min': min(week_data_dic[str(key)])}
+
+
 if __name__ == '__main__':
     app.run(debug=True)
