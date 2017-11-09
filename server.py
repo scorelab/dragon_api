@@ -28,22 +28,32 @@ from datetime import datetime
 import pymongo
 app = Flask(__name__)  # initialization
 
-################ Utilization functions #################
-
-def getNormalizeValue(val, maxVal, minVal):
-    return (val - minVal)/(maxVal - minVal)
-    
-def getWeightedSum(normArr, weightArr):
-    weightedSum = 0
-    for i in range(0, len(normArr)):
-        weightedSum += normArr[i] * weightArr[i]
-    return weightedSum/sum(weightArr)
-    
 ################ DB Handeler ###########################
 uri = 'mongodb://epihack:abcdefg@ds149535.mlab.com:49535/epihack'
 client = pymongo.MongoClient(uri)
 db = client.get_default_database()
 epihack_data = db['epihack_data']
+epihack_data_wieght = db['epihack_data_wieght']
+
+################ Utilization functions #################
+
+
+def getNormalizeValue(val, maxVal, minVal):
+    return (val - minVal) / (maxVal - minVal)
+
+
+def getWeightedSum(normArr, weightArr):
+    weightedSum = 0
+    for i in range(0, len(normArr)):
+        weightedSum += normArr[i] * weightArr[i]
+    return weightedSum / sum(weightArr)
+
+
+def getWeight(weight_key):
+    wieght_data = epihack_data_wieght.find_one(
+        {'wieght_key': 'area_of_the_ward'})
+    return wieght_data['wieght']
+
 
 ############ WEB APP ###################################
 api_base_url = '/dragon-api'
@@ -103,28 +113,33 @@ data = {
               }
     }
 '''
+
+
 @app.route(api_base_url + '/insertNew/district=<string:dis>/word=<int:word>/year=<int:yr>/month=<int:mnt>/week=<int:wk>/data=<string:json>', methods=["GET"])
 def insertNew(dis, word, yr, mnt, wk, json):
-    res = {'district': dis,
-        'ward': word,
-        'year': yr,
-        'month': mnt,
-        'week': wk,
-        'data': json
-        }
-    #x = db.epihack_data.insertOne(res)
-    #print(x)    
-    return jsonify(res)
+    data = {'district': dis,
+            'ward': word,
+            'year': yr,
+            'month': mnt,
+            'week': wk,
+            'data': json
+            }
 
-@app.route(api_base_url + '/insertData/district=<string:dis>/word=<int:word>/newdata=<string:data>', methods=['GET'])
-def insertData(dis, word, data):
-    res = {
-        'district' : dis,
-        'word' : word,
-        "data" : data
-        }
-    return jsonify(res)
-    print(res)
+    res = epihack_data_wieght.insert_one(data)
+    return jsonify({'acknowledged': res.acknowledged})
+
+
+@app.route(api_base_url + '/insertDataWieght/wieght_key=<string:wieght_key>/wieght_name=<string:wieght_name>/wieght=<int:wieght>', methods=['GET'])
+def insertDataWieght(wieght_key, wieght_name, wieght):
+
+    wieght_data = {
+        'wieght_key': wieght_key,
+        'wieght_name': wieght_name,
+        "wieght": wieght
+    }
+
+    res = epihack_data_wieght.insert_one(wieght_data)
+    return jsonify({'acknowledged': res.acknowledged})
 
 
 if __name__ == '__main__':
